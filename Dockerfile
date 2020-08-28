@@ -1,4 +1,6 @@
-ARG BASE_IMAGE=adoptopenjdk:11-hotspot
+ARG BASE_IMAGE=registry.cloudbrocktec.com/redhat/ubi/ubi8
+#ARG BASE_IMAGE=localhost/redhat/ubi/ubi8:8.2
+#ARG BASE_IMAGE=adoptopenjdk:11-hotspot
 FROM $BASE_IMAGE
 
 ENV SSO_ENABLED false
@@ -20,9 +22,13 @@ EXPOSE 8091
 CMD ["/entrypoint.py"]
 ENTRYPOINT ["/sbin/tini", "--"]
 
-RUN apt-get update && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends fontconfig python3 python3-jinja2 \
-    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
+RUN yum update -y \
+    && yum install -y java-1.8.0-openjdk-headless fontconfig python3 python3-jinja2 \
+    && yum clean all
+
+#RUN apt-get update && apt-get upgrade -y \
+#    && apt-get install -y --no-install-recommends fontconfig python3 python3-jinja2 \
+#    && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
 ARG TINI_VERSION=v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /sbin/tini
